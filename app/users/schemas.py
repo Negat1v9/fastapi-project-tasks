@@ -21,5 +21,5 @@ class ShowUser(BaseModel):
         orm_mode = True
 
 class UpdateUserRequest(BaseModel):
-    email: EmailStr | None
+    password: str | None
 

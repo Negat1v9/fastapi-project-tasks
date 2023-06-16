@@ -16,6 +16,6 @@ async def login(user_credentails: OAuth2PasswordRequestForm = Depends(),
     token = await authenticate_user(email=user_credentails.username,
                                      password=user_credentails.password,
                                      session=session)
-    access_token = schemas.AccessToken(token=token,
-                                       type="bearer")
+    access_token = schemas.AccessToken(access_token=token,
+                                       token_type="bearer")
     return access_token

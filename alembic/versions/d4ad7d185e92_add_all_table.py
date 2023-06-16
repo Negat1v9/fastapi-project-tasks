@@ -1,8 +1,8 @@
 """Add all table
 
-Revision ID: 986ee720b60b
+Revision ID: d4ad7d185e92
 Revises: 
-Create Date: 2023-06-11 18:01:10.605684
+Create Date: 2023-06-16 20:17:07.012946
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '986ee720b60b'
+revision = 'd4ad7d185e92'
 down_revision = None
 branch_labels = None
 depends_on = None

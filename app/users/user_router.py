@@ -5,11 +5,10 @@ from sqlalchemy.exc import IntegrityError
 
 from . user_actions import (_create_new_user,
                               _get_user_by_id,
-                              _delete_user,
-                              _update_user)
-
+                              _delete_user,)
 from database.database import get_session
-
+from app.oauth2 import get_current_user
+from app.auth.schemas import TokenData
 from . import schemas
 
 router = APIRouter(prefix="/user", tags=["User"])
@@ -31,6 +30,7 @@ async def create_user(new_user: schemas.UserCreate,
             response_model=schemas.ShowUser)
 async def show_user_by_id(user_id: int,
                          session: AsyncSession = Depends(get_session),
+                         current_user: TokenData = Depends(get_current_user),
 ) -> schemas.ShowUser:
     user = await _get_user_by_id(user_id=user_id,
                                 session=session,)
@@ -58,25 +58,3 @@ async def delete_user(user_id: int,
                         detail=f"user with id {user_id} not found",
         )
     return del_user
-
-@router.patch("/", status_code=200,
-              response_model=schemas.ShowUser)
-async def update_user(user_id: int,
-                      body: schemas.UpdateUserRequest,
-                      session: AsyncSession = Depends(get_session)
-) -> schemas.ShowUser:
-    user_for_update = await _get_user_by_id(user_id=user_id,
-                                            session=session,)
-    if user_for_update is None:
-        raise HTTPException(status_code=status.HTTP_404,
-                        detail=f"user with id {user_id} not found",
-        )
-    updation_data = body.dict(exclude_none=True)
-    if updation_data == {}:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"The field with updated data cannot be None",)
-    updated_user = await _update_user(new_user_params=updation_data,
-                                      user_id=user_id,
-                                      session=session,)
-    return updated_user

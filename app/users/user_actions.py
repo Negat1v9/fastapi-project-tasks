@@ -1,7 +1,6 @@
 from database import user_crud
 from app.users.schemas import UserCreate, ShowUser
 from app.auth.schemas import VerifyUser
-from database.models import User
 from .. import security
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,24 +44,6 @@ async def _get_user_by_email(email: str, session: AsyncSession
         return VerifyUser(id=current_user.id,
                           hash_password=current_user.password)
             
-async def _update_user(new_user_params: dict, 
-                       user_id: int,
-                       session: AsyncSession
-) -> ShowUser | HTTPException:
-    async with session.begin():
-        db_user = user_crud.UserCrud(session=session)
-        
-        up_user: User = await db_user.update_user(
-            user_id=user_id,
-            **new_user_params,
-)
-        if up_user is None:
-            raise HTTPException(status_code=404,
-                    detail=f"user with id {user_id} is not found")
-        return ShowUser(id=up_user.id,
-                    email=up_user.email,
-                    is_active=up_user.is_active,
-)
 
 async def _delete_user(user_id: int, session: AsyncSession
 ) -> ShowUser | HTTPException:
@@ -77,9 +58,3 @@ async def _delete_user(user_id: int, session: AsyncSession
                 email=del_user.email,
                 is_active=del_user.is_active
             )
-async def _update_user_pass(user_id: int, password: dict,
-                    session: AsyncSession) -> ShowUser | None:
-    async with session.begin():
-        db_user = user_crud.UserCrud(session=session)
-        pass
-

@@ -4,7 +4,6 @@ from . import config
 from app.auth.schemas import TokenData
 from database.database import get_session
 from .users.user_actions import _get_user_by_id, _get_user_by_email
-from . users.schemas import ShowUser
 
 from datetime import datetime, timedelta
 
@@ -16,7 +15,7 @@ from jose import jwt, JWTError
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
+# function for creating access token 
 async def authenticate_user(email: str,
                             password: str,
                             session: AsyncSession
@@ -29,7 +28,7 @@ async def authenticate_user(email: str,
     access_token = create_access_token({"user_id": current_user.id})
     return access_token
 
-
+# create access token with payload
 def create_access_token(data: dict) -> str:
     work_data = data.copy()
     
@@ -44,7 +43,7 @@ def create_access_token(data: dict) -> str:
     return encoded_token
 # decode access token return user
 def verify_access_token(token: str) -> TokenData:
-    critical_error = HTTPException(status_code=status.HTTP_401,
+    critical_error = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                         detail=f"Could not valided token")
     try:
         payload = jwt.decode(token, settings.SECRET_KEY,
@@ -56,7 +55,7 @@ def verify_access_token(token: str) -> TokenData:
     except JWTError:
         raise critical_error
     return token_data
-
+# function for geting user from token
 async def get_current_user(token: str = Depends(oauth2_scheme),
                            session: AsyncSession = Depends(get_session)
 ) -> TokenData:

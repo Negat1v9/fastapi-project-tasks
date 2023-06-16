@@ -39,18 +39,7 @@ class UserCrud:
         current_user = res.fetchone()
         if current_user is not None:
             return current_user[0]
-    # method for updating user
-    async def update_user(self, user_id: int, **kwargs) -> models.User | None:
-        query = (update(models.User)
-                .where(models.User.id == user_id)
-                .values(kwargs)
-                .returning(models.User))
-        
-        res = await self.session.execute(query)
-        updated_user = res.fetchone()
-        if updated_user is not None:
-            return updated_user[0]
-        
+
     async def delete_user(self, user_id: int) -> models.User | None:
         query = (update(models.User)
                 .where(and_(models.User.id == user_id,

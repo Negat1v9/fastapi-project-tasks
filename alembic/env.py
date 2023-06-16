@@ -11,6 +11,7 @@ from app.config import settings
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+config = context.config
 section = config.config_ini_section
 config.set_section_option(section, "DB_USER", settings.DB_USER)
 config.set_section_option(section, "DB_PASS", settings.DB_PASS)
