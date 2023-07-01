@@ -30,7 +30,7 @@ class ManagerGroup(Base):
     id = sa.Column(sa.Integer(), primary_key=True, nullable=False,
                          autoincrement="auto")
     name = sa.Column(sa.String(255), server_default=sa.text("NULL"))
-    user_id = sa.Column(sa.Integer(), sa.ForeignKey("users.id"),
+    manager_id = sa.Column(sa.Integer(), sa.ForeignKey("users.id"),
                         nullable=False)
 """ User can write new task and appoint another user to perform"""
 class GeneralMiss(Base):
