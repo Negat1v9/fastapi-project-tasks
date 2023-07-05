@@ -2,7 +2,7 @@ from .config import settings
 from .security import verify_user_password
 from . import config
 from app.auth.schemas import TokenData
-from database.database import get_session
+from . database.database import get_session
 from .users.user_actions import _get_user_by_id, _get_user_by_email
 
 from datetime import datetime, timedelta

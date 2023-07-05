@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import HTTPException
 
-from database.models import User
+from ..database.models import User
 from app.users.schemas import UserCreate, ShowUser
 from app.auth.schemas import VerifyUser
 from .. import security

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import schemas
 from ..oauth2 import authenticate_user
-from database.database import get_session
+from ..database.database import get_session
 
 auth_router = APIRouter(tags=["Authentication"])
 

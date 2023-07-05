@@ -4,10 +4,10 @@ import random
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy import select, insert
-from database.models import User, Mission, ManagerGroup
+from app.database.models import User, Mission
 from main import app
-from database.database import get_session
-from database.database import Base
+from app.database.database import get_session
+from app.database.database import Base
 from app.oauth2 import create_access_token
 TEST_POSTGRES_URL = f"postgresql+asyncpg://testus2:testus2@localhost:5432/test"
 

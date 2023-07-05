@@ -5,6 +5,7 @@ import uvicorn
 from app.users import user_router
 from app.auth import auth_router
 from app.missions import mission_router
+from app.group import group_router
 
 app = FastAPI(title="Todo List App")
 
@@ -22,6 +23,7 @@ app.add_middleware(
 app.include_router(auth_router.auth_router)
 app.include_router(user_router.router)
 app.include_router(mission_router.router)
+app.include_router(group_router.router)
 
 @app.get("/")
 async def root():

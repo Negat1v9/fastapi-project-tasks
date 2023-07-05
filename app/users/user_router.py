@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from . user_actions import (_create_new_user,
                               _get_user_by_id,
                               _delete_user,)
-from database.database import get_session
+from ..database.database import get_session
 from app.oauth2 import get_current_user
 from app.auth.schemas import TokenData
 from . import schemas

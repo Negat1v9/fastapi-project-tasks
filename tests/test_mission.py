@@ -7,7 +7,7 @@ from .conftest import (create_task_in_db,
                        create_user_not_id,
                        test_async_session)
 
-from app.missions.mission_action import (_create_group_users,
+from app.group.group_action import (_create_group_users,
                                          _add_user_in_group, _create_group_task)
 
 async def test_create_task(client: AsyncClient):
@@ -85,7 +85,7 @@ async def test_create_group(client: AsyncClient):
     await create_test_user_in_db(**user)
     user_fr_db = await get_test_user_by_id(user["id"])
     assert user_fr_db is not None
-    res = await client.post("/task/group/create", json={"name": "Test"},
+    res = await client.post("/group/create", json={"name": "Test"},
             headers=create_headers_for_user(user["id"]))
     assert res.status_code == 201
     assert res.json()["name"] == "Test"
@@ -104,7 +104,7 @@ async def test_add_user_in_group(client: AsyncClient):
     assert group.manager_id == user["id"]
     new_group = {"user_id": new_user_in_group["id"],
                 "group_id": group.id}
-    res = await client.post("/task/group/add/user", json=new_group,
+    res = await client.post("/group/add/user", json=new_group,
             headers=create_headers_for_user(user["id"]))
     assert res.status_code == 200
     assert res.json()["user_id"] == new_user_in_group["id"]
@@ -125,12 +125,12 @@ async def test_get_all_users_group(client: AsyncClient):
     user_in_group = await _add_user_in_group(test_async_session(), 
                         new_user_in_group["id"], group.id)
     assert user_in_group is not None
-    res = await client.get("/task/group/user",
+    res = await client.get("group/user",
                 headers=create_headers_for_user(new_user_in_group["id"]))
     assert res.status_code == 200
     data: list = res.json()
     assert data[0]["user_id"] == new_user_in_group["id"]
-    assert data[0]["ManagerGroup"]["name"] == "GroupName"
+    assert data[0]["group"]["name"] == "GroupName"
     
 async def test_delete_user_fr_group(client: AsyncClient):
     # owner group
@@ -146,7 +146,7 @@ async def test_delete_user_fr_group(client: AsyncClient):
                         new_user_in_group["id"], group.id)
     assert user_in_group is not None
     res = await client.delete(
-    f"/task/group/drop/user?del_user_id={new_user_in_group['id']}&"\
+    f"/group/drop/user?del_user_id={new_user_in_group['id']}&"\
         f"group_id={group.id}",
                 headers=create_headers_for_user(user["id"]))
     assert res.status_code == 200
@@ -164,12 +164,30 @@ async def test_create_group_task(client: AsyncClient):
     assert group is not None
     new_task: dict = {"task": "Simple task",
                       "group_id": group.id,}
-    res = await client.post("task/group/add/task", json=new_task,
+    res = await client.post("/group/add/task", json=new_task,
                 headers=create_headers_for_user(user["id"]))
     assert res.status_code == 201
     data = res.json()
     assert data["task"] == "Simple task"
     assert data["owner_id"] == user["id"]
+    
+async def test_get_all_group_task(client: AsyncClient):
+    user: dict = create_user_not_id()
+    await create_test_user_in_db(**user)
+    user_fr_db = await get_test_user_by_id(user["id"])
+    group = await _create_group_users(test_async_session(), user["id"], "TestName")
+    user_in_group = await _add_user_in_group(test_async_session(), user["id"], group.id)
+    assert user_in_group is not None
+    task: dict = {"task": "Text",
+                  "group_id": group.id}
+    task_in_db = await _create_group_task(test_async_session(), user["id"], **task)
+    assert task_in_db is not None
+    res = await client.get(f"/group/all/task?group_id={group.id}", 
+            headers=create_headers_for_user(user["id"]))
+    assert res.status_code == 200
+    tasks = res.json()
+    assert tasks[0]["task"] == task["task"]
+    assert tasks[0]["owner"]["id"] == user["id"]
     
 async def tets_edit_group_task(client: AsyncClient):
     user: dict = create_user_not_id()
@@ -187,7 +205,7 @@ async def tets_edit_group_task(client: AsyncClient):
     assert task_in_db is not None
     edit_task: dict = {"task_id": task_in_db.id,
                        "task": "Two task"}
-    res = await client.patch("/task/group/edit/task", json=edit_task,
+    res = await client.patch("/group/edit/task", json=edit_task,
                 headers=create_headers_for_user(user["id"]))
     assert res.status_code == 200
     assert res.json()["task"] == edit_task["task"]
@@ -207,7 +225,7 @@ async def test_delete_group_task(client: AsyncClient):
                   "group_id": group.id}
     task_in_db = await _create_group_task(test_async_session(), user["id"], **task)
     
-    res = await client.delete(f"/task/group/delete/task?task_id={task_in_db.id}",
+    res = await client.delete(f"/group/delete/task?task_id={task_in_db.id}",
                 headers=create_headers_for_user(user["id"]))
     assert res.status_code == 200
     assert res.json() == task_in_db.id

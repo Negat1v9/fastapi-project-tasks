@@ -34,7 +34,6 @@ class ShowUser(BaseModel):
     id: int
     first_name: str
     last_name: str
-    email: str
     
     class Config:
         orm_mode = True
