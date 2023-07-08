@@ -16,17 +16,15 @@ The api application is developed using a framework [FastApi](https://fastapi.tia
 	- removal
 ## launching the application
 1. Create .env file
-2. With docker
-Run:
+- With docker -> Run:
 ```sh
 docker-compose up --build
 ```
-==Application runs on port 8000== 
-3. Local with Python
-Run:
+Application runs on port 8000 
+- Local with Python -> Run:
 ```sh
-postry install # install all packeges and dependencys
+poetry install # install all packeges and dependencys
 poetry run alembic upgrade head # create all table in database
 poetry run python main.py # run app
 ```
-==Application runs on port 8000==
+Application runs on port 8000
