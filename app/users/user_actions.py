@@ -27,8 +27,7 @@ async def _create_new_user(body: UserCreate, session: AsyncSession
         return ShowUser(id=new_user.id,
                         first_name=new_user.first_name,
                         last_name=new_user.last_name,
-                        email=new_user.email,
-                        )
+                        email=new_user.email)
 async def _get_user_by_id(user_id: int, session: AsyncSession
 ) -> ShowUser | HTTPException:
     # query to select user with id

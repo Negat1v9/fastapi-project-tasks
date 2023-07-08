@@ -45,7 +45,7 @@ async def add_group_user(body: sh.UserAddInGroup,
 
 @router.delete("/drop/user", status_code=200)
 async def delete_user_from_group(del_user_id: int,
-                                 group_id: int,
+                                group_id: int,
                                 current_user: TokenData = Depends(get_current_user),
                                 session: AsyncSession = Depends(get_session)):
     current_group = await ga._get_group_by_id(session, group_id)
@@ -53,7 +53,11 @@ async def delete_user_from_group(del_user_id: int,
     if current_group.manager_id != current_user.id:
          raise HTTPException(404,
                 detail=f"group with id {current_group.id} not found")
-    delete_user = await ga._delete_user_from_group(session, del_user_id,
+    # if owner want delete himself and group is already empty
+    if del_user_id == current_user.id:
+        # count_users_in_group = awa
+        pass
+    await ga._delete_user_from_group(session, del_user_id,
                                                    current_group.id)
     return {"status": "success", "message": "deleted"}
 
@@ -72,6 +76,10 @@ async def create_group_task(body: sh.UserGroupAddTask,
     # check user in group if not -> exception
     user_in_group = await ga._get_user_from_group(session, current_user.id,
                                                   body.group_id)
+    # if debror is not None ckeck he is in this group
+    if body.debtor_id:
+        debtor_in_group = await ga._get_user_from_group(session, body.debtor_id,
+                                                        body.group_id)
     # create dict 
     task = body.dict()
     new_group_task = await ga._create_group_task(session, user_in_group.user_id,

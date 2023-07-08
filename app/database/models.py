@@ -51,3 +51,14 @@ class UserGroup(Base):
         "users.id", ondelete="CASCADE"), primary_key=True)
     group_id = sa.Column(sa.Integer(), sa.ForeignKey(
         "managersgroups.id", ondelete="CASCADE"), primary_key=True)
+    
+class RefreshToken(Base):
+    __tablename__ = "refresh_token"
+    id = sa.Column(sa.UUID, primary_key=True)
+    user_id = sa.Column(sa.ForeignKey("users.id", ondelete="CASCADE"),
+                        nullable=False, primary_key=True)
+    refresh_token = sa.Column(sa.String, nullable=False)
+    expires_at = sa.Column(sa.DateTime, nullable=False)
+    created_at = sa.Column(sa.DateTime, server_default=sa.text("now()"),
+                           nullable=False)
+    

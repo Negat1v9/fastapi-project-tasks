@@ -1,4 +1,4 @@
-from sqlalchemy import (select, insert, update, delete, and_)
+from sqlalchemy import (select, insert, update, delete, and_, func)
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import aliased
@@ -53,20 +53,17 @@ async def _add_user_in_group(session: AsyncSession, user_id: int,
     return user_group[0]
 
 async def _delete_user_from_group(session: AsyncSession, user_id: int, group_id: int
-) -> UserGroup:
+) -> None:
     query = (delete(UserGroup).where(
-            and_(UserGroup.user_id == user_id, UserGroup.group_id == group_id))
-            .returning(UserGroup))
+            and_(UserGroup.user_id == user_id, UserGroup.group_id == group_id)))
 # try delete user, catch exception user not in group
     try:
         async with session.begin():
-            res = await session.execute(query)
+            await session.execute(query)
     except NoResultFound:
         raise HTTPException(404,
                 detail=f"user with id {user_id} not in this group")
         
-    delete_user = res.fetchone()
-    return delete_user[0]
 # select user from his group 
 async def _get_user_from_group(session: AsyncSession, user_id: int, group_id: int
 ) -> UserGroup:

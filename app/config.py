@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_MINUTS: int
+    REFRESH_TOKEN_MINUTS: int
+    REFRESH_SECRET: str
     
     class Config:
         env_file = ".env"
