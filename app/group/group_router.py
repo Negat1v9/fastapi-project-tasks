@@ -43,6 +43,40 @@ async def add_group_user(body: sh.UserAddInGroup,
                                                     owner_group.id,)
     return new_user_in_group
 
+@router.patch("/edit/{group_id}", response_model=sh.ManagerGroupShow)
+async def edit_group_params(group_id: int,
+                            body: sh.ManagerGroupEdit,
+                            current_user: TokenData = Depends(get_current_user),
+                            session: AsyncSession = Depends(get_session)
+) -> sh.ManagerGroupShow:
+    params_for_update = body.dict(exclude_none=True)
+    # if user put empty field
+    if params_for_update == {}:
+        raise HTTPException(422, f"The field with parameters is empty")
+    current_group = await ga._get_group_by_id(session, group_id)
+    # check current group exist and user is owner if it is open
+    if not current_group.is_open and current_group.manager_id != current_user.id:
+        raise HTTPException(404, "Group does not exist")
+    # catch except if simple user want make group open
+    elif current_group.is_open and \
+            not body.is_open and \
+            current_user.id != current_group.manager_id:
+        raise HTTPException(422, "Only manager can make group open")
+    # set new group parameters
+    updated_group = await ga._edit_manager_group(session, group_id, **params_for_update)
+    return updated_group
+
+@router.delete("/drop/group/{group_id}", status_code=200)
+async def delete_manager_and_group(group_id: int,
+                                   current_user: TokenData = Depends(get_current_user),
+                                   session: AsyncSession = Depends(get_session)):
+    current_group = await ga._get_group_by_id(session, group_id)
+    # only manager of group can delete it
+    if current_group.manager_id != current_user.id:
+        raise HTTPException(422, "Only manager can delete group")
+    group_id = await ga._delete_group(session, group_id)
+    return {"status": "success", "message": "Group deleted"}
+
 @router.delete("/drop/user", status_code=200)
 async def delete_user_from_group(del_user_id: int,
                                 group_id: int,
@@ -55,8 +89,7 @@ async def delete_user_from_group(del_user_id: int,
                 detail=f"group with id {current_group.id} not found")
     # if owner want delete himself and group is already empty
     if del_user_id == current_user.id:
-        # count_users_in_group = awa
-        pass
+        raise HTTPException(400, f"Manager cannot delete himself")
     await ga._delete_user_from_group(session, del_user_id,
                                                    current_group.id)
     return {"status": "success", "message": "deleted"}

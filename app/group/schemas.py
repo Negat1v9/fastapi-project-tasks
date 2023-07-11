@@ -10,9 +10,16 @@ class ManagerGroupShow(BaseModel):
     id: int
     name: str | None
     manager_id: int
+    is_open: bool
     
     class Config:
         orm_mode = True
+        
+class ManagerGroupEdit(GroupCreate):
+    name: str | None = None
+    manager_id: int | None = None
+    is_open: bool | None = None
+    
         
 class UserAddInGroup(BaseModel):
     user_id: int

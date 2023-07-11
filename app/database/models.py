@@ -32,6 +32,8 @@ class ManagerGroup(Base):
     name = sa.Column(sa.String(255), server_default=sa.text("NULL"))
     manager_id = sa.Column(sa.Integer(), sa.ForeignKey("users.id"),
                         nullable=False)
+    is_open = sa.Column(sa.BOOLEAN(), nullable=False,
+                        server_default=(sa.text("false")))
 """ User can write new task and appoint another user to perform"""
 class GeneralMiss(Base):
     __tablename__ = "generalmissions"
@@ -39,8 +41,8 @@ class GeneralMiss(Base):
     task = sa.Column(sa.String(), nullable=False)
     created_at = sa.Column(sa.TIMESTAMP(timezone=True),
                            server_default=sa.text("now()"))
-    group_id = sa.Column(sa.Integer(), sa.ForeignKey("managersgroups.id"),
-                         nullable=False)
+    group_id = sa.Column(sa.Integer(),sa.ForeignKey("managersgroups.id",
+                                    ondelete=("CASCADE")), nullable=False)
     owner_id = sa.Column(sa.Integer(), sa.ForeignKey(
         "users.id"), nullable=False)    
     debtor_id = sa.Column(sa.Integer(), sa.ForeignKey("users.id"))

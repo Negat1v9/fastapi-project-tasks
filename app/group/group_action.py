@@ -31,7 +31,32 @@ async def _get_group_by_id(session: AsyncSession, group_id,
         raise HTTPException(404,
                 detail=f"the group with id: {group_id} does not exist")
     return group[0]
+# updated table with group info
+async def _edit_manager_group(session: AsyncSession,
+                              group_id: int, 
+                              **kwargs,
+) -> ManagerGroup:
+    query = (update(ManagerGroup).values(kwargs)
+            .where(ManagerGroup.id == group_id)
+            .returning(ManagerGroup))
+    try:
+        async with session.begin():
+            res = await session.execute(query)
+# catch exception if user id for manager not exist
+    except IntegrityError:
+        raise HTTPException(404, "User is not found")
+    updated_group = res.fetchone()
+    return updated_group[0]
 
+async def _delete_group(session: AsyncSession, group_id: int
+) -> None:
+    query = delete(ManagerGroup).where(ManagerGroup.id == group_id)
+    try:
+        async with session.begin():
+            await session.execute(query)
+    except IntegrityError:
+        raise HTTPException(500, "Something went wrong")
+    
 async def _add_user_in_group(session: AsyncSession, user_id: int,
                              group_id: int
 ) -> UserGroup:

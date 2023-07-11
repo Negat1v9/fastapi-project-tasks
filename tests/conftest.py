@@ -9,7 +9,7 @@ from main import app
 from app.database.database import get_session
 from app.database.database import Base
 from app.oauth2 import create_access_token
-TEST_POSTGRES_URL = f"postgresql+asyncpg://testus2:testus2@localhost:5432/test"
+TEST_POSTGRES_URL = f"postgresql+asyncpg://testus:testus@localhost:5432/test"
 
 test_engine = create_async_engine(TEST_POSTGRES_URL)
 
@@ -49,8 +49,7 @@ async def client():
 
 
 def create_headers_for_user(id) -> dict[str, str]:
-    access_token = create_access_token(
-        data={"user_id": str(id)})
+    access_token = create_access_token(id)
     return {"Authorization": f"Bearer {access_token}"}
     
 async def create_test_user_in_db(**kwargs) -> tuple:

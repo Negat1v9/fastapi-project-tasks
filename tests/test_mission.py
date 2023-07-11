@@ -229,3 +229,38 @@ async def test_delete_group_task(client: AsyncClient):
                 headers=create_headers_for_user(user["id"]))
     assert res.status_code == 200
     assert res.json() == task_in_db.id
+    
+async def test_edit_group(client: AsyncClient):
+    user: dict = create_user_not_id()
+    await create_test_user_in_db(**user)
+    user_fr_db = await get_test_user_by_id(user["id"])
+    assert user_fr_db is not None
+    group = await _create_group_users(test_async_session(), user["id"], "NameGroup")
+    user_in_group = await _add_user_in_group(test_async_session(), user["id"],
+                                             group.id)
+    assert user_in_group.user_id == user["id"]
+    assert group is not None
+    new_group_params = {"name": "SecondName",
+                        "is_open": "True"}
+    res = await client.patch(f"/group/edit/{group.id}", json=new_group_params,
+                    headers=create_headers_for_user(user["id"]))
+    assert res.status_code == 200
+    res_data = res.json()
+    assert res_data["id"] == group.id
+    assert res_data["name"] == new_group_params["name"]
+    assert res_data["is_open"] == True
+    
+async def test_delete_group(client: AsyncClient):
+    user: dict = create_user_not_id()
+    await create_test_user_in_db(**user)
+    user_fr_db = await get_test_user_by_id(user["id"])
+    assert user_fr_db is not None
+    group = await _create_group_users(test_async_session(), user["id"], "NameGroup")
+    user_in_group = await _add_user_in_group(test_async_session(), user["id"],
+                                             group.id)
+    assert user_in_group.user_id == user["id"]
+    assert group is not None
+    res = await client.delete(f"/group/drop/group/{group.id}",
+            headers=create_headers_for_user(user["id"]))
+    assert res.status_code == 200
+    assert res.json()["status"] == "success"
