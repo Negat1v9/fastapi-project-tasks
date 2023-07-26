@@ -1,8 +1,0 @@
-/__pycache__/
-/.git/
-/.env
-/.env-dev
-/.venv/
-/.pytest_cache/
-/tests/
-__init__.py

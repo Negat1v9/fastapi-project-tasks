@@ -22,13 +22,20 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 async def authenticate_user(email: str, password: str, session: AsyncSession,
                             user_id: int | None = None
 ) -> dict | HTTPException:
+    """The function is designed to create 2 authorization tokens.
+    Used for authentication or for changing tokens and password.
+    Can work with both two parameters
+    for user initialization: Email or user ID"""
 # if authentificate user get user id from db else it from request
     if not user_id:
         current_user = await _get_user_by_email(email=email, session=session)
 # ckeck user password
-        if not verify_user_password(password, current_user.hash_password):
+        if not verify_user_password(password, current_user.password):
             raise HTTPException(status_code=403,
                                 detail="Invalid Data")
+# check user is confirmed
+        if not current_user.is_confirmed:
+            raise HTTPException(422, "Verify your email")
         user_id = current_user.id # user id = user id from db
 # create access token with payload user inside
     access_token = create_access_token(user_id)

@@ -12,6 +12,7 @@ class User(Base):
     created_at = sa.Column(sa.TIMESTAMP(timezone=True),
                             server_default=sa.text("now()"),
                             nullable=False)
+    is_confirmed = sa.Column(sa.Boolean(), server_default="false")
     is_active = sa.Column(sa.Boolean(), server_default="true")
 """Table for contain ordinary users tasks """
 class Mission(Base):
